@@ -2,16 +2,13 @@
 import os
 import log
 import datetime
-import threading
 
 # Insert Users
-
 
 class User:
     def __init__(self, id: str, has_label: bool) -> None:
         self.id = id
         self.has_label = has_label
-
 
 def generate_users(dataset_folder=str) -> list[User]:
     users = []
@@ -33,7 +30,7 @@ def generate_users(dataset_folder=str) -> list[User]:
 # Insert Trackpoints
 
 class Trackpoint:
-    def __init__(self, id: int, activity_id: int, lat: float, lon: float, altitude: float, date_days: str, date_time: str) -> None:
+    def __init__(self, id: int, activity_id: int, lat: float, lon: float, altitude: float, date_days: float, date_time: datetime.datetime) -> None:
         self.id = id
         self.activity_id = activity_id
         self.lat = lat
@@ -54,7 +51,7 @@ def generate_trackpoints_for(dataset_folder: str, user_id:str, activity_id:str) 
         for (lineno,line) in enumerate(f):
             if lineno < 6:
                 continue
-            lat, lon, _, altitude, _, date_days, date_time = line.strip().split(',')
+            lat, lon, _, altitude, days, date, time = line.strip().split(',')
 
             # Todo: ta stilling til altitude
             if False and altitude == '-777':
@@ -78,7 +75,19 @@ def generate_trackpoints_for(dataset_folder: str, user_id:str, activity_id:str) 
                 log.error(f'Could not convert altitude={altitude} to float, in file {activity_file} on line {lineno + 1}')
                 exit(-1)
 
-            trackpoint = Trackpoint(0, activity_id, lat, lon, altitude, date_days, date_time)
+            try:
+                date_days = float(days)
+            except ValueError:
+                log.error(f'Could not convert date_days={date_days} to float, in file {activity_file} on line {lineno + 1}')
+                exit(-1)
+
+            try:
+                date_time = datetime.datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                log.error(f'Could not convert date_time={date_time} to datetime, in file {activity_file} on line {lineno + 1}')
+                exit(-1)
+
+            trackpoint = Trackpoint(0,  activity_id + user_id, lat, lon, altitude, date_days, date_time)
             trackpoints.append(trackpoint)
 
     return trackpoints
@@ -116,45 +125,38 @@ def generate_activities_for_user(dataset_folder: str, user: User, activities: li
         end_date_time = datetime.datetime(1900, 1, 1)
 
         for trackpoint in trackpoints:
-            date = trackpoint.date_days
-            time = trackpoint.date_time
-            trackpoint_time = datetime.datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M:%S')
-
-            if trackpoint_time < start_date_time:
-                start_date_time = trackpoint_time
-            if trackpoint_time > end_date_time:
-                end_date_time = trackpoint_time
+            if trackpoint.date_time < start_date_time:
+                start_date_time = trackpoint.date_time
+            if trackpoint.date_time > end_date_time:
+                end_date_time = trackpoint.date_time
 
         transportation_mode = ""
 
-        activity = Activity(activity_id, user.id, transportation_mode, start_date_time, end_date_time)
+        activity = Activity(activity_id + user.id, user.id, transportation_mode, start_date_time, end_date_time)
         activities.append(activity)
-
-    print(f'Generated activities for user {user.id}')
 
 def generate_activities(dataset_folder: str, users: list[User]) -> list[Activity]:
     activities = []
-    threads = []
 
-    start_time = datetime.datetime.now()
-
-    multiprocessing = False
-    if multiprocessing:
-        for user in users:
-            thread = threading.Thread(target=generate_activities_for_user, args=(dataset_folder, user, activities))
-            threads.append(thread)
-
-        for thread in threads:
-            thread.start()
-        
-        for (i,thread) in enumerate(threads):
-            thread.join()
-    else:
-        for user in users:
-            generate_activities_for_user(dataset_folder, user, activities)
-
-    end_time = datetime.datetime.now()
-    duration = end_time - start_time
-    print(f'Generating activities took {duration}')
+    for user in users:
+        generate_activities_for_user(dataset_folder, user, activities)
 
     return activities
+
+def generate_trackpoints_for_user(dataset_folder: str, user: User, trackpoints: list[Trackpoint]) -> None:
+    data_folder = os.path.join(dataset_folder, 'Data')
+    user_folder = os.path.join(data_folder, user.id)
+    trajectory_folder = os.path.join(user_folder, 'Trajectory')
+    for activity_folder in os.listdir(trajectory_folder):
+        activity_id = activity_folder.split('.')[0]
+
+        new_trackpoints = generate_trackpoints_for(dataset_folder, user.id, activity_id)
+        trackpoints.extend(new_trackpoints)
+
+def generate_trackpoints(dataset_folder: str, users: list[User]) -> list[Trackpoint]:
+    trackpoints = []
+    
+    for user in users:
+        generate_trackpoints_for_user(dataset_folder, user, trackpoints)
+
+    return trackpoints
