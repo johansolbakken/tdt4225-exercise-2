@@ -29,3 +29,8 @@ create_trackpoint_table = """
                               FOREIGN KEY (activity_id) REFERENCES activity(id) ON DELETE CASCADE ON UPDATE CASCADE
                           )
                           """
+
+insert_user = """
+                INSERT INTO user (id, has_labels)
+                VALUES (%s, %s)
+                """

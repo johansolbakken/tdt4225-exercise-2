@@ -1,6 +1,7 @@
 import db
 import queries
 import log
+import model
 
 logo = """
   _   _ _ _                 _____  ____  
@@ -14,6 +15,9 @@ logo = """
 
 class App:
     def __init__(self):
+        print("NihaoDB v0.0.1-alpha")
+        print(logo)
+
         self.__running : bool = True
         self.__nuke : bool = False
         self.__dataset : str = ""
@@ -30,12 +34,10 @@ class App:
         self.__connector.close_connection()
 
     def run(self):
-        print("NihaoDB v0.0.1-alpha")
-
-        print(logo)
 
         if self.should_create_tables():
             self.create_tables()
+            self.upload_data()
 
         while self.__running:
             self.__running = False
@@ -68,6 +70,20 @@ class App:
         self.__cursor.execute(queries.create_activity_table)
         self.__cursor.execute(queries.create_trackpoint_table)
         log.success("Created tables")
+
+    def upload_data(self):
+        # Upload users
+        users: list[model.User] = model.generate_users(self.__dataset)
+        for user in users:
+            if user.has_label:
+                self.__cursor.execute(queries.insert_user, (user.id, 1))
+            else:
+                self.__cursor.execute(queries.insert_user, (user.id, 0))
+        log.success(f'Generated {len(users)} users')
+
+        activities : list[model.Activity] = model.generate_activities(self.__dataset, users)
+        print(len(activities))
+
 
     def set_dataset(self, dataset):
         self.__dataset = dataset
