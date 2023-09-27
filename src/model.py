@@ -2,6 +2,7 @@
 import os
 import log
 import datetime
+import threading
 
 # Insert Users
 
@@ -94,45 +95,66 @@ class Activity:
         self.start_date_time = start_date_time
         self.end_date_time = end_date_time
 
+def generate_activities_for_user(dataset_folder: str, user: User, activities: list[Activity]) -> None:
+    data_folder = os.path.join(dataset_folder, 'Data')
+    user_folder = os.path.join(data_folder, user.id)
+
+    labels_file = os.path.join(user_folder, 'labels.txt')
+    labels = []
+    if os.path.isfile(labels_file):
+        with open(labels_file, 'r') as f:
+            labels = f.readlines()
+            labels = [x.strip() for x in labels]
+
+    trajectory_folder = os.path.join(user_folder, 'Trajectory')
+    for activity_file in os.listdir(trajectory_folder):
+        activity_id = activity_file.split('.')[0]
+
+        trackpoints = generate_trackpoints_for(dataset_folder, user.id, activity_id)
+        
+        start_date_time = datetime.datetime.now()
+        end_date_time = datetime.datetime(1900, 1, 1)
+
+        for trackpoint in trackpoints:
+            date = trackpoint.date_days
+            time = trackpoint.date_time
+            trackpoint_time = datetime.datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M:%S')
+
+            if trackpoint_time < start_date_time:
+                start_date_time = trackpoint_time
+            if trackpoint_time > end_date_time:
+                end_date_time = trackpoint_time
+
+        transportation_mode = ""
+
+        activity = Activity(activity_id, user.id, transportation_mode, start_date_time, end_date_time)
+        activities.append(activity)
+
+    print(f'Generated activities for user {user.id}')
 
 def generate_activities(dataset_folder: str, users: list[User]) -> list[Activity]:
     activities = []
+    threads = []
 
-    data_folder = os.path.join(dataset_folder, 'Data')
-    for (i,user) in enumerate(users):
-        user_folder = os.path.join(data_folder, user.id)
+    start_time = datetime.datetime.now()
 
-        labels_file = os.path.join(user_folder, 'labels.txt')
-        labels = []
-        if os.path.isfile(labels_file):
-            with open(labels_file, 'r') as f:
-                labels = f.readlines()
-                labels = [x.strip() for x in labels]
+    multiprocessing = False
+    if multiprocessing:
+        for user in users:
+            thread = threading.Thread(target=generate_activities_for_user, args=(dataset_folder, user, activities))
+            threads.append(thread)
 
-        trajectory_folder = os.path.join(user_folder, 'Trajectory')
-        for activity_file in os.listdir(trajectory_folder):
-            activity_file_path = os.path.join(trajectory_folder, activity_file)
+        for thread in threads:
+            thread.start()
+        
+        for (i,thread) in enumerate(threads):
+            thread.join()
+    else:
+        for user in users:
+            generate_activities_for_user(dataset_folder, user, activities)
 
-            activity_id = activity_file.split('.')[0]
-
-            trackpoints = generate_trackpoints_for(dataset_folder, user.id, activity_id)
-            
-            start_date_time = datetime.datetime.now()
-            end_date_time = datetime.datetime(1900, 1, 1)
-
-            for trackpoint in trackpoints:
-                date = trackpoint.date_days
-                time = trackpoint.date_time
-                trackpoint_time = datetime.datetime.strptime(date + ' ' + time, '%Y-%m-%d %H:%M:%S')
-
-                if trackpoint_time < start_date_time:
-                    start_date_time = trackpoint_time
-                if trackpoint_time > end_date_time:
-                    end_date_time = trackpoint_time
-
-            transportation_mode = ""
-
-            activity = Activity(activity_id, user.id, transportation_mode, start_date_time, end_date_time)
-            activities.append(activity)
+    end_time = datetime.datetime.now()
+    duration = end_time - start_time
+    print(f'Generating activities took {duration}')
 
     return activities
