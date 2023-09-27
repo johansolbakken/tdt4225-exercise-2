@@ -21,6 +21,11 @@ class App:
             USER="example",
             PASSWORD="example",
         )
+        self.__cursor = self.__connector.cursor
+        self.__db_connection = self.__connector.db_connection
+
+    def __shutdown(self):
+        self.__connector.close_connection()
 
     def run(self):
         print("NihaoDB v0.0.1-alpha")
@@ -30,6 +35,8 @@ class App:
         while self.__running:
             print(self.__dataset)
             self.__running = False
+
+        self.__shutdown()
 
     def set_dataset(self, dataset):
         self.__dataset = dataset
