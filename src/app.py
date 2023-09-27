@@ -3,6 +3,7 @@ import queries
 import log
 import model
 import datetime
+import os
 
 logo = """
   _   _ _ _                 _____  ____  
@@ -14,10 +15,20 @@ logo = """
 
 """
 
+logo_with_colors = """
+  _   _ _ _                \033[1;31m _____  \033[0m____  
+ | \ | (_) |               \033[1;31m|  __ \\\033[0m|  _ \ 
+ |  \| |_| |__   __ _  ___ \033[1;31m| |  | |\033[0m |_) |
+ | . ` | | '_ \ / _` |/ _ \\\033[1;31m| |  | |\033[0m  _ < 
+ | |\  | | | | | (_| | (_) \033[1;31m| |__| |\033[0m |_) |
+ |_| \_|_|_| |_|\__,_|\___/\033[1;31m|_____/\033[0m|____/ 
+
+"""
+
 class App:
     def __init__(self):
         print("NihaoDB v0.0.1-alpha")
-        print(logo)
+        print(logo_with_colors)
 
         self.__running : bool = True
         self.__nuke : bool = False
@@ -77,6 +88,10 @@ class App:
         log.success("Created tables")
 
     def upload_data(self):
+        if not os.path.isdir(self.__dataset):
+            log.warning(f"Dataset {self.__dataset} is not a directory (skipping uploading data)")
+            return
+
         # Upload users
         log.info("Generating users data")
         start = datetime.datetime.now()
