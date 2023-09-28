@@ -2,32 +2,8 @@
 import os
 import log
 import datetime
-
-# Insert Users
-
-class User:
-    def __init__(self, id: str, has_label: bool) -> None:
-        self.id = id
-        self.has_label = has_label
-
-def generate_users(dataset_folder=str) -> list[User]:
-    users = []
-
-    labeled_ids_file = os.path.join(dataset_folder, 'labeled_ids.txt')
-    with open(labeled_ids_file, 'r') as f:
-        labeled_ids = f.readlines()
-        labeled_ids = [x.strip() for x in labeled_ids]
-
-    data_folder = os.path.join(dataset_folder, 'Data')
-    for id in os.listdir(data_folder):
-        if id in labeled_ids:
-            users.append(User(id, True))
-        else:
-            users.append(User(id, False))
-
-    return users
-
-# Insert Trackpoints
+import config
+import performance
 
 class Trackpoint:
     def __init__(self, id: int, activity_id: int, lat: float, lon: float, altitude: float, date_days: float, date_time: datetime.datetime) -> None:
@@ -38,6 +14,22 @@ class Trackpoint:
         self.altitude = altitude
         self.date_days = date_days
         self.date_time = date_time
+
+class Activity:
+    def __init__(self, id: int, user_id: str, transportation_mode: str, start_date_time: datetime.datetime, end_date_time: datetime.datetime) -> None:
+        self.id = id
+        self.user_id = user_id
+        self.transportation_mode = transportation_mode
+        self.start_date_time = start_date_time
+        self.end_date_time = end_date_time
+
+        self.trackpoints: list[Trackpoint] = []
+
+class User:
+    def __init__(self, id: str, has_label: bool) -> None:
+        self.id = id
+        self.has_label = has_label
+        self.activities: list[Activity] = []
 
 def generate_trackpoints_for(dataset_folder: str, user_id:str, activity_id:str) -> list[Trackpoint]:
     trackpoints = []
@@ -94,16 +86,6 @@ def generate_trackpoints_for(dataset_folder: str, user_id:str, activity_id:str) 
 
 
 
-# Insert Activities
-
-class Activity:
-    def __init__(self, id: int, user_id: str, transportation_mode: str, start_date_time: datetime.datetime, end_date_time: datetime.datetime) -> None:
-        self.id = id
-        self.user_id = user_id
-        self.transportation_mode = transportation_mode
-        self.start_date_time = start_date_time
-        self.end_date_time = end_date_time
-
 def generate_activities_for_user(dataset_folder: str, user: User, activities: list[Activity]) -> None:
     data_folder = os.path.join(dataset_folder, 'Data')
     user_folder = os.path.join(data_folder, user.id)
@@ -120,6 +102,8 @@ def generate_activities_for_user(dataset_folder: str, user: User, activities: li
         activity_id = activity_file.split('.')[0]
 
         trackpoints = generate_trackpoints_for(dataset_folder, user.id, activity_id)
+        if len(trackpoints) > config.MAX_TRACKPOINT_SIZE:
+            continue
         
         start_date_time = datetime.datetime.now()
         end_date_time = datetime.datetime(1900, 1, 1)
@@ -133,30 +117,27 @@ def generate_activities_for_user(dataset_folder: str, user: User, activities: li
         transportation_mode = ""
 
         activity = Activity(activity_id + user.id, user.id, transportation_mode, start_date_time, end_date_time)
+        activity.trackpoints = trackpoints
         activities.append(activity)
 
-def generate_activities(dataset_folder: str, users: list[User]) -> list[Activity]:
-    activities = []
+def generate_dataset(dataset_folder:str) -> list[User]:
+    users = []
 
-    for user in users:
-        generate_activities_for_user(dataset_folder, user, activities)
+    labeled_ids_file = os.path.join(dataset_folder, 'labeled_ids.txt')
+    with open(labeled_ids_file, 'r') as f:
+        labeled_ids = f.readlines()
+        labeled_ids = [x.strip() for x in labeled_ids]
 
-    return activities
-
-def generate_trackpoints_for_user(dataset_folder: str, user: User, trackpoints: list[Trackpoint]) -> None:
     data_folder = os.path.join(dataset_folder, 'Data')
-    user_folder = os.path.join(data_folder, user.id)
-    trajectory_folder = os.path.join(user_folder, 'Trajectory')
-    for activity_folder in os.listdir(trajectory_folder):
-        activity_id = activity_folder.split('.')[0]
+    for id in os.listdir(data_folder):
+        user = User(id, False)
+        if id in labeled_ids:
+            user.has_label = True
 
-        new_trackpoints = generate_trackpoints_for(dataset_folder, user.id, activity_id)
-        trackpoints.extend(new_trackpoints)
+        generate_activities_for_user(dataset_folder, user, user.activities)
+        if len(user.activities) == 0:
+            continue
 
-def generate_trackpoints(dataset_folder: str, users: list[User]) -> list[Trackpoint]:
-    trackpoints = []
-    
-    for user in users:
-        generate_trackpoints_for_user(dataset_folder, user, trackpoints)
+        users.append(user)
 
-    return trackpoints
+    return users
