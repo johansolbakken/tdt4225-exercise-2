@@ -25,20 +25,19 @@ class App:
         Database.shutdown()
 
     def run(self):
-        _ = performance.Timer("(App) App create tables")
-
         # -------------- Part 1 --------------
 
         if self.__nuke:
+            _ = performance.Timer("(App) App nuke database")
             Database.nuke_database()
 
         if self.should_reset_db():
+            _ = performance.Timer("(App) App reset database")
             self.reset_db()
-
 
         # -------------- Part 2 --------------
 
-        # 1 
+        # 1
         number_of_users = Database.get_number_of_users()
         log.info(f"Number of users: {number_of_users}")
 
@@ -58,9 +57,7 @@ class App:
         min_trackpoints_per_user = Database.get_min_trackpoints_per_user()
         log.info(f"Min trackpoints per user: {min_trackpoints_per_user}")
 
-        
-
-
+    
     def should_reset_db(self):
         if self.__nuke:
             return True

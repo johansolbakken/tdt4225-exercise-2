@@ -1,7 +1,7 @@
 import dbconnection
 import log
 import performance
-import queries
+import queries as Queries
 from model import User
 
 """
@@ -61,9 +61,9 @@ def create_tables():
     check_initiated()
     _ = performance.Timer("(Database) Creating tables")
 
-    cursor.execute(queries.create_user_table)
-    cursor.execute(queries.create_activity_table)
-    cursor.execute(queries.create_trackpoint_table)
+    cursor.execute(Queries.create_user_table)
+    cursor.execute(Queries.create_activity_table)
+    cursor.execute(Queries.create_trackpoint_table)
 
 def upload_data(self, data: list[User]=[]):
     global cursor, db_connection
@@ -81,16 +81,16 @@ def upload_data(self, data: list[User]=[]):
             f"\tUploading data for user {user.id} ({percentage:.2f}%)")
 
         if user.has_label:
-            self.__cursor.execute(queries.insert_user, (user.id, 1))
+            self.__cursor.execute(Queries.insert_user, (user.id, 1))
         else:
-            self.__cursor.execute(queries.insert_user, (user.id, 0))
+            self.__cursor.execute(Queries.insert_user, (user.id, 0))
 
         for activity in user.activities:
-            self.__cursor.execute(queries.insert_activity, (activity.id, activity.user_id,
+            self.__cursor.execute(Queries.insert_activity, (activity.id, activity.user_id,
                                     activity.transportation_mode, activity.start_date_time, activity.end_date_time))
 
             for trackpoint in activity.trackpoints:
-                self.__cursor.execute(queries.insert_new_trackpoint, (trackpoint.activity_id, trackpoint.lat,
+                self.__cursor.execute(Queries.insert_new_trackpoint, (trackpoint.activity_id, trackpoint.lat,
                                         trackpoint.lon, trackpoint.altitude, trackpoint.date_days, trackpoint.date_time))
         self.__db_connection.commit()
 
@@ -108,19 +108,19 @@ def tables_exist():
 def get_number_of_users():
     global cursor
     check_initiated()
-    cursor.execute("SELECT COUNT(*) FROM user")
+    cursor.execute(Queries.number_of_users)
     return cursor.fetchone()[0]
 
 def get_number_of_activities():
     global cursor
     check_initiated()
-    cursor.execute("SELECT COUNT(*) FROM activity")
+    cursor.execute(Queries.number_of_activities)
     return cursor.fetchone()[0]
 
 def get_number_of_trackpoints():
     global cursor
     check_initiated()
-    cursor.execute("SELECT COUNT(*) FROM trackpoint")
+    cursor.execute(Queries.number_of_trackpoints)
     return cursor.fetchone()[0]
 
 # 2 
@@ -128,26 +128,17 @@ def get_number_of_trackpoints():
 def get_average_trackpoints_per_user():
     global cursor
     check_initiated()
-    cursor.execute("""SELECT AVG(t.amount)FROM (
-                        SELECT COUNT(trackpoint.id) as amount
-                        FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
-                        GROUP BY user_id) as t""")
+    cursor.execute(Queries.average_trackpoint_per_user)
     return cursor.fetchone()[0]
 
 def get_max_trackpoints_per_user():
     global cursor
     check_initiated
-    cursor.execute("""SELECT MAX(t.amount)FROM (
-                        SELECT COUNT(trackpoint.id) as amount
-                        FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
-                        GROUP BY user_id) as t""")
+    cursor.execute(Queries.most_trackpoint_per_user)
     return cursor.fetchone()[0]
 
 def get_min_trackpoints_per_user():
     global cursor
     check_initiated()
-    cursor.execute("""SELECT MIN(t.amount)FROM (
-                        SELECT COUNT(trackpoint.id) as amount
-                        FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
-                        GROUP BY user_id) as t""")
+    cursor.execute(Queries.least_trackpoint_per_user)
     return cursor.fetchone()[0]

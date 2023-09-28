@@ -45,3 +45,26 @@ insert_new_trackpoint = """
                     INSERT INTO trackpoint (activity_id, lat, lon, altitude, date_days, date_time)
                     VALUES (%s, %s, %s, %s, %s, %s)
                     """
+
+# Part 2
+
+number_of_users = "SELECT COUNT(*) FROM user"
+
+number_of_activities = "SELECT COUNT(*) FROM activity"
+
+number_of_trackpoints = "SELECT COUNT(*) FROM trackpoint"
+
+average_trackpoint_per_user = """SELECT AVG(t.amount)FROM (
+                                    SELECT COUNT(trackpoint.id) as amount
+                                    FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
+                                    GROUP BY user_id) as t"""
+
+most_trackpoint_per_user = """SELECT MAX(t.amount)FROM (
+                                SELECT COUNT(trackpoint.id) as amount
+                                FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
+                                GROUP BY user_id) as t"""
+
+least_trackpoint_per_user = """SELECT MIN(t.amount)FROM (
+                                SELECT COUNT(trackpoint.id) as amount
+                                FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
+                                GROUP BY user_id) as t"""
