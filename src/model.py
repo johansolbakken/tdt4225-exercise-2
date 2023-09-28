@@ -4,6 +4,7 @@ import log
 import datetime
 import config
 import performance
+import pickle
 
 class Trackpoint:
     def __init__(self, id: int, activity_id: int, lat: float, lon: float, altitude: float, date_days: float, date_time: datetime.datetime) -> None:
@@ -24,12 +25,17 @@ class Activity:
         self.end_date_time = end_date_time
 
         self.trackpoints: list[Trackpoint] = []
-
 class User:
     def __init__(self, id: str, has_label: bool) -> None:
         self.id = id
         self.has_label = has_label
         self.activities: list[Activity] = []
+class Dataset:
+    def __init__(self, users=[]) -> None:
+        self.users = users
+
+    def toJson(self):
+        return [u.toJson() for u in self.users]
 
 def generate_trackpoints_for(dataset_folder: str, user_id:str, activity_id:str) -> list[Trackpoint]:
     trackpoints = []
@@ -171,5 +177,19 @@ def generate_dataset(dataset_folder:str) -> list[User]:
             continue
 
         users.append(user)
+        # 👹👹👹👹👹👹👹👹👹👹👹👹👹👹👹👹👹👹👹👹👹🇪🇸🇪🇸🇪🇸🇪🇸🇪🇸🇪🇸
+        # break
 
     return users
+
+def write_dataset_to_cache(users: list[User], filename:str="data/memcache.pkl"):
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+    with open(filename, 'wb') as f:
+        pickle.dump(users, f)
+   
+
+def load_dataset_from_cache(filename:str="data/memcache.pkl") -> list[User]:
+    with open(filename, 'rb') as f:
+        users = pickle.load(f)
+    return users    

@@ -37,6 +37,7 @@ class App:
         self.__nuke : bool = False
         self.__use_small_dataset : bool = False
         self.__dataset : str = ""
+        self.__cachefile : str = ".appcache/memcache.pkl"
         try:
             self.__connector : db.DbConnector = db.DbConnector(
                 HOST="localhost",
@@ -59,7 +60,10 @@ class App:
             _ = performance.Timer("App create tables")
             start = datetime.datetime.now()
             self.create_tables()
-            self.upload_data()
+            if self.cache_exists():
+                self.upload_data_from_cache()
+            else:
+                self.upload_data()
             end = datetime.datetime.now()
             log.success(f"Finished creating database and uploading files in {end - start}")
 
@@ -80,6 +84,7 @@ class App:
         log.success("Nuked database")
 
     def should_create_tables(self):
+        return True # 👹👹👹👹👹👹
         _ = performance.Timer("App should create tables")
         if self.__nuke:
             return True
@@ -92,24 +97,33 @@ class App:
     
     def create_tables(self):
         _ = performance.Timer("App create tables")
-        self.nuke_database()
+        if self.__nuke:
+            self.nuke_database()
         self.__cursor.execute(queries.create_user_table)
         self.__cursor.execute(queries.create_activity_table)
         self.__cursor.execute(queries.create_trackpoint_table)
         log.success("Created tables")
 
-    def upload_data(self):
+    def upload_data(self, data=[]):
         _ = performance.Timer("App upload data")
         if not os.path.isdir(self.__dataset):
             log.warning(f"Dataset {self.__dataset} is not a directory (skipping uploading data)")
             return
         
-        data = model.generate_dataset(self.__dataset)
+        if data == []:
+            data = model.generate_dataset(self.__dataset)
+            _ = performance.Timer("Writing generated data to cache")
+            model.write_dataset_to_cache(data, self.__cachefile)
 
         for (i,user) in enumerate(data):
+            # if already exists, skip
+            self.__cursor.execute("SELECT * FROM user WHERE id = %s", (user.id,))
+            if self.__cursor.fetchone() is not None:
+                continue
+
             percentage = (i+1)/len(data) * 100
             _ = performance.Timer(f"\tUploading data for user {user.id} ({percentage:.2f}%)")
-            
+        
             if user.has_label:
                 self.__cursor.execute(queries.insert_user, (user.id, 1))
             else:
@@ -130,3 +144,10 @@ class App:
 
     def set_small_dataset(self, small):
         self.__use_small_dataset = small
+
+    def cache_exists(self):
+        return os.path.exists(self.__cachefile)
+
+    def upload_data_from_cache(self):
+        data = model.load_dataset_from_cache(self.__cachefile)
+        self.upload_data(data)
