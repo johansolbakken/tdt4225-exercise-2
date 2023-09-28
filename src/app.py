@@ -105,53 +105,22 @@ class App:
             return
         
         data = model.generate_dataset(self.__dataset)
-        print(len(data))
 
-        # # Upload users
-        # log.info("Generating users data")
-        # start = datetime.datetime.now()
-        # users: list[model.User] = model.generate_users(self.__dataset, self.__use_small_dataset)
-        # end = datetime.datetime.now()
-        # log.info(f"Generated users in {end - start}")
-        # log.info("Uploading users data")
-        # start = datetime.datetime.now()
-        # for user in users:
-        #     if user.has_label:
-        #         self.__cursor.execute(queries.insert_user, (user.id, 1))
-        #     else:
-        #         self.__cursor.execute(queries.insert_user, (user.id, 0))
-        # self.__db_connection.commit()
-        # end = datetime.datetime.now()
-        # log.success(f'Generated {len(users)} users in {end - start}')
+        for (i,user) in enumerate(data):
+            percentage = (i+1)/len(data) * 100
+            _ = performance.Timer(f"\tUploading data for user {user.id} ({percentage:.2f}%)")
+            
+            if user.has_label:
+                self.__cursor.execute(queries.insert_user, (user.id, 1))
+            else:
+                self.__cursor.execute(queries.insert_user, (user.id, 0))
 
-        # # Upload activities
-        # log.info("Generating activities data")
-        # start = datetime.datetime.now()
-        # activities : list[model.Activity] = model.generate_activities(self.__dataset, users, self.__use_small_dataset)
-        # end = datetime.datetime.now()
-        # log.info(f"Generated activities in {end - start}")
-        # log.info("Uploading activities data")
-        # start = datetime.datetime.now()
-        # for activity in activities:
-        #     self.__cursor.execute(queries.insert_activity, (activity.id, activity.user_id, activity.transportation_mode, activity.start_date_time, activity.end_date_time))
-        # self.__db_connection.commit()
-        # end = datetime.datetime.now()
-        # log.success(f'Generated {len(activities)} activities in {end - start}')
+            for activity in user.activities:
+                self.__cursor.execute(queries.insert_activity, (activity.id, activity.user_id, activity.transportation_mode, activity.start_date_time, activity.end_date_time))
 
-        # # Upload trackpoints
-        # log.info("Generating trackpoints data")
-        # start = datetime.datetime.now()
-        # trackpoints : list[model.Trackpoint] = model.generate_trackpoints(self.__dataset, users, self.__use_small_dataset)
-        # end = datetime.datetime.now()
-        # log.info(f"Generated trackpoints in {end - start} seconds")
-        # log.info("Uploading trackpoints data")
-        # start = datetime.datetime.now()
-        # for (i,trackpoint) in enumerate(trackpoints):
-        #     print(f"{(i+1)/len(trackpoints)}%")
-        #     self.__cursor.execute(queries.insert_new_trackpoint, (trackpoint.activity_id, trackpoint.lat, trackpoint.lon, trackpoint.altitude, trackpoint.date_days, trackpoint.date_time))
-        # self.__db_connection.commit()
-        # end = datetime.datetime.now()
-        # log.success(f'Generated {len(trackpoints)} trackpoints in {end - start}')
+                for trackpoint in activity.trackpoints:
+                    self.__cursor.execute(queries.insert_new_trackpoint, (trackpoint.activity_id, trackpoint.lat, trackpoint.lon, trackpoint.altitude, trackpoint.date_days, trackpoint.date_time))
+            self.__db_connection.commit()
 
     def set_dataset(self, dataset):
         self.__dataset = dataset

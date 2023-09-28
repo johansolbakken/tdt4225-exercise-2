@@ -4,6 +4,7 @@ colors = {
     "SUCCESS": "\033[1;32m",
     "WARNING": "\033[1;33m",
     "INFO": "\033[1;34m",
+    "TIMER": "\033[1;30m",
 }
 
 def log(msg: str, color: str = None):
@@ -23,3 +24,6 @@ def warning(msg: str):
 
 def info(msg: str):
     log(msg, "INFO")
+
+def timer(msg: str):
+    log(msg, "TIMER")
