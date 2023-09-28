@@ -33,12 +33,16 @@ class App:
         self.__running : bool = True
         self.__nuke : bool = False
         self.__dataset : str = ""
-        self.__connector : db.DbConnector = db.DbConnector(
-            HOST="localhost",
-            DATABASE="example",
-            USER="example",
-            PASSWORD="example",
-        )
+        try:
+            self.__connector : db.DbConnector = db.DbConnector(
+                HOST="localhost",
+                DATABASE="example",
+                USER="example",
+                PASSWORD="example",
+            )
+        except Exception as e:
+            log.error(f"Failed to connect to database. {e}")
+            exit(1)
         self.__cursor = self.__connector.cursor
         self.__db_connection = self.__connector.db_connection
 
