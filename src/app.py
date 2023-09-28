@@ -3,6 +3,7 @@ import os
 import performance
 import config
 import db as Database
+import log
 
 
 class App:
@@ -26,14 +27,39 @@ class App:
     def run(self):
         _ = performance.Timer("(App) App create tables")
 
+        # -------------- Part 1 --------------
+
         if self.__nuke:
             Database.nuke_database()
 
         if self.should_reset_db():
             self.reset_db()
 
-        while self.__running:
-            self.__running = False
+
+        # -------------- Part 2 --------------
+
+        # 1 
+        number_of_users = Database.get_number_of_users()
+        log.info(f"Number of users: {number_of_users}")
+
+        number_of_activities = Database.get_number_of_activities()
+        log.info(f"Number of activities: {number_of_activities}")
+
+        number_of_trackpoints = Database.get_number_of_trackpoints()
+        log.info(f"Number of trackpoints: {number_of_trackpoints}")
+
+        # 2
+        average_trackpoints_per_user = Database.get_average_trackpoints_per_user()
+        log.info(f"Average trackpoints per user: {average_trackpoints_per_user}")
+
+        max_trackpoints_per_user = Database.get_max_trackpoints_per_user()
+        log.info(f"Max trackpoints per user: {max_trackpoints_per_user}")
+
+        min_trackpoints_per_user = Database.get_min_trackpoints_per_user()
+        log.info(f"Min trackpoints per user: {min_trackpoints_per_user}")
+
+        
+
 
     def should_reset_db(self):
         if self.__nuke:

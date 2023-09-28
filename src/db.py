@@ -101,3 +101,53 @@ def tables_exist():
     cursor.execute("SHOW TABLES")
     tables = cursor.fetchall()
     return len(tables) == 3
+
+# -------------- Part 2 --------------
+
+# 1
+def get_number_of_users():
+    global cursor
+    check_initiated()
+    cursor.execute("SELECT COUNT(*) FROM user")
+    return cursor.fetchone()[0]
+
+def get_number_of_activities():
+    global cursor
+    check_initiated()
+    cursor.execute("SELECT COUNT(*) FROM activity")
+    return cursor.fetchone()[0]
+
+def get_number_of_trackpoints():
+    global cursor
+    check_initiated()
+    cursor.execute("SELECT COUNT(*) FROM trackpoint")
+    return cursor.fetchone()[0]
+
+# 2 
+
+def get_average_trackpoints_per_user():
+    global cursor
+    check_initiated()
+    cursor.execute("""SELECT AVG(t.amount)FROM (
+                        SELECT COUNT(trackpoint.id) as amount
+                        FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
+                        GROUP BY user_id) as t""")
+    return cursor.fetchone()[0]
+
+def get_max_trackpoints_per_user():
+    global cursor
+    check_initiated
+    cursor.execute("""SELECT MAX(t.amount)FROM (
+                        SELECT COUNT(trackpoint.id) as amount
+                        FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
+                        GROUP BY user_id) as t""")
+    return cursor.fetchone()[0]
+
+def get_min_trackpoints_per_user():
+    global cursor
+    check_initiated()
+    cursor.execute("""SELECT MIN(t.amount)FROM (
+                        SELECT COUNT(trackpoint.id) as amount
+                        FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
+                        GROUP BY user_id) as t""")
+    return cursor.fetchone()[0]
