@@ -101,10 +101,15 @@ def generate_activities_for_user(dataset_folder: str, user: User, activities: li
     for activity_file in os.listdir(trajectory_folder):
         activity_id = activity_file.split('.')[0]
 
+        header_size = 6 # lines
+        with open(os.path.join(trajectory_folder, activity_file), 'r') as f:
+            if len(f.readlines()) - header_size > config.MAX_TRACKPOINT_SIZE:
+                continue
+
         trackpoints = generate_trackpoints_for(dataset_folder, user.id, activity_id)
-        if len(trackpoints) > config.MAX_TRACKPOINT_SIZE:
+        if len(trackpoints) == 0:
             continue
-        
+
         start_date_time = datetime.datetime.now()
         end_date_time = datetime.datetime(1900, 1, 1)
 
@@ -130,6 +135,7 @@ def generate_dataset(dataset_folder:str) -> list[User]:
 
     data_folder = os.path.join(dataset_folder, 'Data')
     for id in os.listdir(data_folder):
+        _ = performance.Timer("Generate dataset for user " + id)
         user = User(id, False)
         if id in labeled_ids:
             user.has_label = True
