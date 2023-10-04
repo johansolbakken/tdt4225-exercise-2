@@ -13,6 +13,8 @@ connector: dbconnection.DbConnector = None
 cursor = None
 db_connection = None
 
+
+
 def init():
     global initiated, connector, cursor, db_connection
     _ = performance.Timer("(Database) Database init")
@@ -108,18 +110,21 @@ def tables_exist():
 def get_number_of_users():
     global cursor
     check_initiated()
+    _ = performance.Timer("(Database) Getting number of users")
     cursor.execute(Queries.number_of_users)
     return cursor.fetchone()[0]
 
 def get_number_of_activities():
     global cursor
     check_initiated()
+    _ = performance.Timer("(Database) Getting number of activities")
     cursor.execute(Queries.number_of_activities)
     return cursor.fetchone()[0]
 
 def get_number_of_trackpoints():
     global cursor
     check_initiated()
+    _ = performance.Timer("(Database) Getting number of trackpoints")
     cursor.execute(Queries.number_of_trackpoints)
     return cursor.fetchone()[0]
 
@@ -128,17 +133,70 @@ def get_number_of_trackpoints():
 def get_average_trackpoints_per_user():
     global cursor
     check_initiated()
+    _ = performance.Timer("(Database) Getting average trackpoints per user")
     cursor.execute(Queries.average_trackpoint_per_user)
     return cursor.fetchone()[0]
 
 def get_max_trackpoints_per_user():
     global cursor
-    check_initiated
+    check_initiated()
+    _ = performance.Timer("(Database) Getting max trackpoints per user")
     cursor.execute(Queries.most_trackpoint_per_user)
     return cursor.fetchone()[0]
 
 def get_min_trackpoints_per_user():
     global cursor
     check_initiated()
+    _ = performance.Timer("(Database) Getting min trackpoints per user")
     cursor.execute(Queries.least_trackpoint_per_user)
     return cursor.fetchone()[0]
+
+# 3
+def get_top_users_most_activites(n:int):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting top users with most activities")
+    cursor.execute(Queries.top_users_most_activites, [n])
+    return cursor.fetchall()
+
+# 4
+def get_all_users_that_used(transportation_mode: str):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all users that have taken the bus")
+    cursor.execute(Queries.users_that_have_taken_transportation_mode, [transportation_mode])
+    return cursor.fetchall()
+
+# 5
+def get_top_users_with_the_most_different_transportation_modes(n:int):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting top users with the most different transportation modes")
+    cursor.execute(Queries.top_users_with_the_most_different_transportation_modes, [n])
+    return cursor.fetchall()
+
+# 6
+def get_all_duplicate_activities():
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all duplicate activities")
+    cursor.execute(Queries.duplicate_activities)
+    return cursor.fetchall()
+
+# 7
+def get_amount_of_users_with_activities_lasting_to_next_day():
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting amount of users with activities lasting to next day")
+    cursor.execute(Queries.users_with_activities_lasting_to_next_day)
+    return cursor.fetchone()[0]
+
+def get_user_transportation_activity_hours_lasting_to_next_day(limit: bool = False):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting users with activities lasting to next day")
+    if limit:
+        cursor.execute(Queries.user_transportation_mode_activity_hours + " LIMIT 15")
+    else:
+        cursor.execute(Queries.user_transportation_mode_activity_hours)
+    return cursor.fetchall()

@@ -46,14 +46,16 @@ insert_new_trackpoint = """
                     VALUES (%s, %s, %s, %s, %s, %s)
                     """
 
-# Part 2
+# ---------- Part 2 ----------
 
+# 2.1
 number_of_users = "SELECT COUNT(*) FROM user"
 
 number_of_activities = "SELECT COUNT(*) FROM activity"
 
 number_of_trackpoints = "SELECT COUNT(*) FROM trackpoint"
 
+# 2.2
 average_trackpoint_per_user = """SELECT AVG(t.amount)FROM (
                                     SELECT COUNT(trackpoint.id) as amount
                                     FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
@@ -68,3 +70,50 @@ least_trackpoint_per_user = """SELECT MIN(t.amount)FROM (
                                 SELECT COUNT(trackpoint.id) as amount
                                 FROM trackpoint JOIN activity ON trackpoint.activity_id = activity.id JOIN user ON user.id = activity.user_id
                                 GROUP BY user_id) as t"""
+
+# 2.3
+top_users_most_activites = """SELECT user.id, COUNT(activity.id)
+                                FROM user JOIN activity on user.id = user_id
+                                GROUP BY user_id
+                                ORDER BY -COUNT(activity.id)
+                                LIMIT %s"""
+
+# 2.4
+users_that_have_taken_transportation_mode = """
+                                            SELECT DISTINCT user_id 
+                                            FROM user join activity on user.id = user_id
+                                            WHERE transportation_mode = %s
+                                            """
+
+# 2.5
+top_users_with_the_most_different_transportation_modes = """SELECT user_id, COUNT(DISTINCT transportation_mode)
+                                                            FROM activity
+                                                            GROUP BY user_id
+                                                            ORDER BY -COUNT(DISTINCT transportation_mode)
+                                                            LIMIT %s"""
+
+# 2.6 
+duplicate_activities = """
+                        SELECT a1.user_id, a1.id, a1.start_date_time, a1.end_date_time
+                        FROM activity as a1, activity as a2
+                        WHERE a1.id != a2.id AND a1.transportation_mode = a2.transportation_mode 
+                                            AND a1.start_date_time = a2.start_date_time 
+                                            AND a1.end_date_time = a2.end_date_time 
+                                            AND a1.user_id = a2.user_id
+"""
+
+# 2.7a 
+users_with_activities_lasting_to_next_day = """
+                        SELECT COUNT(distinct user_id) as antall
+                        FROM activity
+                        WHERE day(start_date_time) + 1 = day(end_date_time) 
+                            AND month(start_date_time) = month(end_date_time)
+                            AND year(start_date_time) = year(end_date_time)"""
+
+# 2.7b
+user_transportation_mode_activity_hours = """
+                        SELECT user_id, transportation_mode, timestampdiff(MINUTE,start_date_time,end_date_time) / 60 as hours
+                        FROM activity
+                        WHERE day(start_date_time) + 1 = day(end_date_time) 
+                            AND month(start_date_time) = month(end_date_time)
+                            AND year(start_date_time) = year(end_date_time)"""
