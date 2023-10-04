@@ -5,6 +5,7 @@ colors = {
     "WARNING": "\033[1;33m",
     "INFO": "\033[1;34m",
     "TIMER": "\033[1;30m",
+    "TASK": "\033[1;35m",
 }
 
 def log(msg: str, color: str = None):

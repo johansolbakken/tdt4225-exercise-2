@@ -26,6 +26,7 @@ class App:
 
     def run(self):
         # -------------- Part 1 --------------
+        log.log("Task 1", "TASK")
 
         if self.__nuke:
             _ = performance.Timer("(App) App nuke database")
@@ -38,6 +39,7 @@ class App:
         # -------------- Part 2 --------------
 
         # 1
+        log.log("Task 2.1", "TASK")
         number_of_users = Database.get_number_of_users()
         log.info(f"Number of users: {number_of_users}")
 
@@ -48,6 +50,7 @@ class App:
         log.info(f"Number of trackpoints: {number_of_trackpoints}")
 
         # 2
+        log.log("Task 2.2", "TASK")
         average_trackpoints_per_user = Database.get_average_trackpoints_per_user()
         log.info(f"Average trackpoints per user: {average_trackpoints_per_user}")
 
