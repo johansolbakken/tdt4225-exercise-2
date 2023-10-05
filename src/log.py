@@ -8,7 +8,12 @@ colors = {
     "TASK": "\033[1;35m",
 }
 
+__enabled = True
+
 def log(msg: str, color: str = None):
+    global __enabled
+    if not __enabled:
+        return
     if color:
         print(f"{colors[color]}[{color}]\033[0m {msg}")
     else:
@@ -28,3 +33,7 @@ def info(msg: str):
 
 def timer(msg: str):
     log(msg, "TIMER")
+
+def enabled(enabled: bool):
+    global __enabled
+    __enabled = enabled

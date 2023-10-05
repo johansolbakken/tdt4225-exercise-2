@@ -31,6 +31,10 @@ create_trackpoint_table = """
                           )
                           """
 
+indexes = [
+    ["altitude", "CREATE INDEX altitude_index ON trackpoint (altitude)", "DROP INDEX altitude_index ON trackpoint"],
+]
+
 insert_user = """
                 INSERT INTO user (id, has_labels)
                 VALUES (%s, %s)
@@ -117,3 +121,36 @@ user_transportation_mode_activity_hours = """
                         WHERE day(start_date_time) + 1 = day(end_date_time) 
                             AND month(start_date_time) = month(end_date_time)
                             AND year(start_date_time) = year(end_date_time)"""
+
+get_all_users = "SELECT * FROM user"
+
+get_all_activities = "SELECT * FROM activity"
+
+get_all_trackpoints = "SELECT * FROM trackpoint"
+
+get_all_valid_trackpoints_for_activity = """SELECT altitude
+                                            FROM trackpoint
+                                            WHERE activity_id = %s
+                                                AND altitude != -777
+                                            ORDER BY date_time"""
+
+distinct_transportation_modes = """SELECT DISTINCT transportation_mode
+                                    FROM activity
+                                    WHERE activity.transportation_mode != "";"""
+
+
+# 10. 
+# Find the users that have traveled the longest total distance in one day for each transportation mode. 
+
+get_users_longest_distance_one_day_per_trasnportation_mode = """
+                        SELECT user_id,
+                        transportation_mode,
+                        TIMESTAMPDIFF(MINUTE, start_date_time, end_date_time) / 60 AS hours
+                        FROM activity
+                        WHERE DAY(start_date_time) = DAY(end_date_time)
+                        AND MONTH(start_date_time) = MONTH(end_date_time)
+                        AND YEAR(start_date_time) = YEAR(end_date_time)
+                        AND transportation_mode != "";
+                            """
+
+

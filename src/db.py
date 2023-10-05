@@ -2,7 +2,7 @@ import dbconnection
 import log
 import performance
 import queries as Queries
-from model import User
+import datetime
 
 """
 Singleton database connection
@@ -12,7 +12,6 @@ initiated: bool = False
 connector: dbconnection.DbConnector = None
 cursor = None
 db_connection = None
-
 
 
 def init():
@@ -51,9 +50,14 @@ def nuke_database():
     _ = performance.Timer("(Database) Nuking database")
 
     try:
+        for name, _, drop in Queries.indexes:
+            cursor.execute(drop)
+            log.info(f"(Database) Dropped index {name}")
+
         cursor.execute("DROP TABLE IF EXISTS trackpoint")
         cursor.execute("DROP TABLE IF EXISTS activity")
         cursor.execute("DROP TABLE IF EXISTS user")
+
     except Exception as e:
         log.error(f"(Database) Failed to nuke database. {e}")
         exit(1)
@@ -67,34 +71,9 @@ def create_tables():
     cursor.execute(Queries.create_activity_table)
     cursor.execute(Queries.create_trackpoint_table)
 
-def upload_data(self, data: list[User]=[]):
-    global cursor, db_connection
-    check_initiated()
-    _ = performance.Timer("(Database) Uploading data")
-    for (i, user) in enumerate(data):
-        # if already exists, skip
-        self.__cursor.execute(
-            "SELECT * FROM user WHERE id = %s", (user.id,))
-        if self.__cursor.fetchone() is not None:
-            continue
-
-        percentage = (i+1)/len(data) * 100
-        _ = performance.Timer(
-            f"\tUploading data for user {user.id} ({percentage:.2f}%)")
-
-        if user.has_label:
-            self.__cursor.execute(Queries.insert_user, (user.id, 1))
-        else:
-            self.__cursor.execute(Queries.insert_user, (user.id, 0))
-
-        for activity in user.activities:
-            self.__cursor.execute(Queries.insert_activity, (activity.id, activity.user_id,
-                                    activity.transportation_mode, activity.start_date_time, activity.end_date_time))
-
-            for trackpoint in activity.trackpoints:
-                self.__cursor.execute(Queries.insert_new_trackpoint, (trackpoint.activity_id, trackpoint.lat,
-                                        trackpoint.lon, trackpoint.altitude, trackpoint.date_days, trackpoint.date_time))
-        self.__db_connection.commit()
+    for name,create,_ in Queries.indexes:
+        cursor.execute(create)
+        log.info(f"(Database) Created index {name}")
 
 def tables_exist():
     global cursor
@@ -199,4 +178,93 @@ def get_user_transportation_activity_hours_lasting_to_next_day(limit: bool = Fal
         cursor.execute(Queries.user_transportation_mode_activity_hours + " LIMIT 15")
     else:
         cursor.execute(Queries.user_transportation_mode_activity_hours)
+    return cursor.fetchall()
+
+def get_all_users():
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all users")
+    cursor.execute(Queries.get_all_users)
+    return cursor.fetchall()
+
+def get_all_activities():
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all activities")
+    cursor.execute(Queries.get_all_activities)
+    return cursor.fetchall()
+
+def get_all_trackpoints():
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all trackpoints")
+    cursor.execute(Queries.get_all_trackpoints)
+    return cursor.fetchall()
+
+def user_exists(user_id: str):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Checking if user exists")
+    cursor.execute(
+        "SELECT * FROM user WHERE id = %s", [user_id])
+    if cursor.fetchone() is not None:
+        return True
+    return False
+
+def get_all_activities_for_user(user_id:str):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all activities for user")
+    cursor.execute(
+        "SELECT * FROM activity WHERE user_id = %s", [user_id])
+    return cursor.fetchall()
+
+def get_all_trackpoints_for_activity(activity_id:str):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all trackpoints for activity")
+    cursor.execute(
+        "SELECT * FROM trackpoint WHERE activity_id = %s", [activity_id])
+    return cursor.fetchall()
+
+def get_all_valid_trackpoints(activity_id:str):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting all valid trackpoints for activity")
+    cursor.execute(Queries.get_all_valid_trackpoints_for_activity, [activity_id])
+    return cursor.fetchall()
+
+def insert_user(user_id:str, has_labels:bool):
+    global cursor, db_connection
+    check_initiated()
+    _ = performance.Timer("(Database) Inserting user")
+    cursor.execute(Queries.insert_user, (user_id, has_labels))
+    db_connection.commit()
+
+def insert_activity(id:str, user_id:str, transportation_mode:str, start_date_time:datetime.datetime, end_date_time:datetime.datetime):
+    global cursor, db_connection
+    check_initiated()
+    _ = performance.Timer("(Database) Inserting activity")
+    cursor.execute(Queries.insert_activity, (id, user_id, transportation_mode, start_date_time, end_date_time))
+    db_connection.commit()
+
+def insert_trackpoint(activity_id:str, lat:str, lon:str, altitude:str, date_days:str, date_time:datetime.datetime):
+    global cursor, db_connection
+    check_initiated()
+    _ = performance.Timer("(Database) Inserting trackpoint")
+    cursor.execute(Queries.insert_new_trackpoint, (activity_id, lat, lon, altitude, date_days, date_time))
+    db_connection.commit()
+
+def get_distinct_transportation_modes():
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting distinct transportation modes")
+    cursor.execute(Queries.distinct_transportation_modes)
+    return cursor.fetchall()
+
+def get_users_longest_distance_one_day_per_trasnsportation_mode():
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Getting users longest distance one day per trasnportation mode")
+    cursor.execute(Queries.get_users_longest_distance_one_day_per_trasnportation_mode)
     return cursor.fetchall()

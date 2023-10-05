@@ -5,6 +5,8 @@ import datetime
 import config
 import performance
 import pickle
+import db as Database
+import tabulate
 
 class Trackpoint:
     def __init__(self, id: int, activity_id: int, lat: float, lon: float, altitude: float, date_days: float, date_time: datetime.datetime) -> None:
@@ -193,3 +195,83 @@ def load_dataset_from_cache(filename:str="data/memcache.pkl") -> list[User]:
     with open(filename, 'rb') as f:
         users = pickle.load(f)
     return users    
+
+def upload_data(data: list[User]=[]):
+    _ = performance.Timer("(Database) Uploading data")
+    for (i, user) in enumerate(data):
+        # if already exists, skip
+        log.enabled(False)
+        if Database.user_exists(user.id):
+            continue
+
+        percentage = (i+1)/len(data) * 100
+        _ = performance.Timer(f"\tUploading data for user {user.id} ({percentage:.2f}%)")
+
+        if user.has_label:
+            Database.insert_user(user.id, 1)
+        else:
+            Database.insert_user(user.id, 0)
+
+        for activity in user.activities:
+            Database.insert_activity(activity.id, activity.user_id, activity.transportation_mode, activity.start_date_time, activity.end_date_time)
+
+            for trackpoint in activity.trackpoints:
+                Database.insert_trackpoint(trackpoint.activity_id, trackpoint.lat, trackpoint.lon, trackpoint.altitude, trackpoint.date_days, trackpoint.date_time)
+        log.enabled(True)
+
+def get_whole_data_set() -> list[User]:
+    _ = performance.Timer("Get whole data set")
+
+    log.enabled(False)
+    users_table = Database.get_all_users()
+    users = []
+
+    for user_row in users_table:
+        user = User(user_row[0], user_row[1])
+
+        activity_table = Database.get_all_activities_for_user(user.id)
+        for activity_row in activity_table:
+            activity = Activity(activity_row[0], activity_row[1], activity_row[2], activity_row[3], activity_row[4])
+
+            trackpoint_table = Database.get_all_trackpoints_for_activity(activity.id)
+            for trackpoint_row in trackpoint_table:
+                trackpoint = Trackpoint(trackpoint_row[0], trackpoint_row[1], trackpoint_row[2], trackpoint_row[3], trackpoint_row[4], trackpoint_row[5], trackpoint_row[6])
+                activity.trackpoints.append(trackpoint)
+
+            user.activities.append(activity)
+        users.append(user)
+
+    log.enabled(True)
+
+    return users
+
+def get_all_users() -> list[User]:
+    users_table = Database.get_all_users()
+    users = []
+
+    for user_row in users_table:
+        user = User(user_row[0], user_row[1])
+        users.append(user)
+
+    return users
+
+def get_all_activities_for_user(user_id: str) -> list[Activity]:
+    activity_table = Database.get_all_activities_for_user(user_id)
+    activities = []
+
+    for activity_row in activity_table:
+        activity = Activity(activity_row[0], activity_row[1], activity_row[2], activity_row[3], activity_row[4])
+        activities.append(activity)
+
+    return activities
+
+def get_all_trackpoints_for_activity(activity_id: str) -> list[Trackpoint]:
+    trackpoint_table = Database.get_all_trackpoints_for_activity(activity_id)
+    trackpoints = []
+
+    for trackpoint_row in trackpoint_table:
+        trackpoint = Trackpoint(trackpoint_row[0], trackpoint_row[1], trackpoint_row[2], trackpoint_row[3], trackpoint_row[4], trackpoint_row[5], trackpoint_row[6])
+        trackpoints.append(trackpoint)
+
+    return trackpoints
+
