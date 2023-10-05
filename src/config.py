@@ -1,3 +1,12 @@
+"""
+file: config.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains all the configuration variables used in the project.
+    
+"""
+
 MAX_TRACKPOINT_SIZE=2500
 PERFORMANCE_TESTING=True
 

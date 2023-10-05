@@ -1,6 +1,14 @@
+"""
+file: dbconnection.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains a class that can be used to connect to a MySQL server.
+    
+"""
+
 import mysql.connector as mysql
 import log
-
 
 class DbConnector:
     """

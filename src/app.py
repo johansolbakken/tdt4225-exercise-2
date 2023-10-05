@@ -1,3 +1,11 @@
+"""
+file: app.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains the main app class.
+"""
+
 import model as Model
 import os
 import performance

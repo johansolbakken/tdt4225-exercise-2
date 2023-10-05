@@ -1,3 +1,11 @@
+"""
+file: model.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains the models for the project.
+    
+"""
 
 import os
 import log
@@ -6,7 +14,6 @@ import config
 import performance
 import pickle
 import db as Database
-import tabulate
 
 class Trackpoint:
     def __init__(self, id: int, activity_id: int, lat: float, lon: float, altitude: float, date_days: float, date_time: datetime.datetime) -> None:

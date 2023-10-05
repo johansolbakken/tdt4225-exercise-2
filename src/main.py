@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+"""
+file: main.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Main file for the project.
+    
+"""
+
 from app import App
 import argparse
 

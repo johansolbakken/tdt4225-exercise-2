@@ -1,3 +1,12 @@
+"""
+file: db.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains all the database functions used in the project.
+    
+"""
+
 import dbconnection
 import log
 import performance

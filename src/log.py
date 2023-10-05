@@ -1,3 +1,11 @@
+"""
+file: log.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains a logger class that can be used to log messages.
+    
+"""
 
 colors = {
     "ERROR": "\033[1;31m",

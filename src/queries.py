@@ -1,3 +1,12 @@
+"""
+file: queries.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains all the queries used in the project.
+    
+"""
+
 create_user_table = """
                     CREATE TABLE IF NOT EXISTS user (
                         id VARCHAR(255) PRIMARY KEY,

@@ -1,8 +1,16 @@
+"""
+file: assignment.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains the assignment class which solves all the tasks.
+
+"""
+
 import db as Database
 import log
 import tabulate
 import algoritmo as Algoritmo
-
 
 class Assignment:
     def task_2_1(self):

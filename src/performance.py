@@ -1,3 +1,12 @@
+"""
+file: performance.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains a timer class that can be used to time functions.
+
+"""
+
 import datetime
 
 import config

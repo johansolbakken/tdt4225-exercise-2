@@ -1,3 +1,12 @@
+"""
+file: algoritmo.py
+written by: Johan Solbakken, Morten Tobias Rinde Sunde
+date: 05.10.2023
+
+    Contains all the algorithms used in the project.
+    
+"""
+
 import log as Log
 import performance as Performance
 import haversine
