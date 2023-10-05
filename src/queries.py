@@ -153,4 +153,8 @@ get_users_longest_distance_one_day_per_trasnportation_mode = """
                         AND transportation_mode != "";
                             """
 
+count_user_activity_transportation_mode = """
+    SELECT COUNT(*) FROM activity WHERE user_id = %s AND transportation_mode = %s AND transportation_mode != ""
+"""
 
+find_user_from_activity = """SELECT user_id FROM activity WHERE id = %s"""

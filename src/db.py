@@ -268,3 +268,17 @@ def get_users_longest_distance_one_day_per_trasnsportation_mode():
     _ = performance.Timer("(Database) Getting users longest distance one day per trasnportation mode")
     cursor.execute(Queries.get_users_longest_distance_one_day_per_trasnportation_mode)
     return cursor.fetchall()
+
+def count_user_activity_transportation_mode(user_id: str, transportation_mode: str):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Count user activity transportation mode")
+    cursor.execute(Queries.count_user_activity_transportation_mode, [user_id, transportation_mode])
+    return cursor.fetchone()[0]
+
+def find_user_id_from_activity_id(activity_id: str):
+    global cursor
+    check_initiated()
+    _ = performance.Timer("(Database) Find user id from activity id")
+    cursor.execute(Queries.find_user_from_activity, [activity_id])
+    return cursor.fetchone()[0]

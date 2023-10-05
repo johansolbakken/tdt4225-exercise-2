@@ -69,6 +69,16 @@ class Assignment:
             log.info(f"Top 10 users with most distance traveled by {transportation_mode}:")
             print(tabulate.tabulate(top, headers=["User ID", "Transportation mode", "Distance (km)"]))
 
+    def task_2_11(self):
+        user_invalid_count = Algoritmo.users_count_invalid_activities()
+        log.info("Users with invalid activities:")
+        print(tabulate.tabulate(user_invalid_count, headers=["User ID", "Number of invalid activities"]))
+
+    def task_2_12(self):
+        user_favorite_transportation_mode = Algoritmo.users_favorite_transportation_mode()
+        log.info("Users favorite transportation mode:")
+        print(tabulate.tabulate(user_favorite_transportation_mode, headers=["User ID", "Transportation mode"]))
+
     ## IKKJE TENCH PA DAO)
 
     def comp(x):

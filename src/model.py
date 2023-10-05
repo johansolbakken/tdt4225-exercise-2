@@ -275,3 +275,16 @@ def get_all_trackpoints_for_activity(activity_id: str) -> list[Trackpoint]:
 
     return trackpoints
 
+def get_transportation_modes():
+    return [x[0] for x in Database.get_distinct_transportation_modes()]
+
+
+def get_all_trackpoints() -> list[Trackpoint]:
+    trackpoint_table = Database.get_all_trackpoints()
+    trackpoints = []
+
+    for trackpoint_row in trackpoint_table:
+        trackpoint = Trackpoint(trackpoint_row[0], trackpoint_row[1], trackpoint_row[2], trackpoint_row[3], trackpoint_row[4], trackpoint_row[5], trackpoint_row[6])
+        trackpoints.append(trackpoint)
+
+    return trackpoints
