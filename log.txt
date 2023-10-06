@@ -1,0 +1,309 @@
+NihaoDB v0.0.1-alpha
+
+  _   _ _ _                [1;31m _____  [0m____  
+ | \ | (_) |               [1;31m|  __ \[0m|  _ \ 
+ |  \| |_| |__   __ _  ___ [1;31m| |  | |[0m |_) |
+ | . ` | | '_ \ / _` |/ _ \[1;31m| |  | |[0m  _ < 
+ | |\  | | | | | (_| | (_) [1;31m| |__| |[0m |_) |
+ |_| \_|_|_| |_|\__,_|\___/[1;31m|_____/[0m|____/ 
+
+
+[1;34m[INFO][0m Connected to: 8.1.0
+[1;34m[INFO][0m You are connected to the database: ('example',)
+[1;30m[TIMER][0m (Database) Database init took 53.14ms
+[1;30m[TIMER][0m (App) App init took 53.33ms
+[1;35m[TASK][0m Task 1
+[1;30m[TIMER][0m (Database) Checking if tables exist took 7.99ms
+[1;35m[TASK][0m Task 2.1
+[1;30m[TIMER][0m (Database) Getting number of users took 2.74ms
+[1;34m[INFO][0m Number of users: 62
+[1;30m[TIMER][0m (Database) Getting number of activities took 4.11ms
+[1;34m[INFO][0m Number of activities: 5141
+[1;30m[TIMER][0m (Database) Getting number of trackpoints took 453.69ms
+[1;34m[INFO][0m Number of trackpoints: 3404641
+[1;35m[TASK][0m Task 2.2
+[1;30m[TIMER][0m (Database) Getting average trackpoints per user took 593.54ms
+[1;34m[INFO][0m Average trackpoints per user: 54913.5645
+[1;30m[TIMER][0m (Database) Getting max trackpoints per user took 508.80ms
+[1;34m[INFO][0m Max trackpoints per user: 433501
+[1;30m[TIMER][0m (Database) Getting min trackpoints per user took 509.05ms
+[1;34m[INFO][0m Min trackpoints per user: 320
+[1;35m[TASK][0m Task 2.3
+[1;30m[TIMER][0m (Database) Getting top users with most activities took 4.31ms
+[1;34m[INFO][0m Top 15 users with most activities:
+  User ID    Number of activities
+---------  ----------------------
+      025                     715
+      062                     691
+      041                     399
+      085                     364
+      167                     320
+      014                     236
+      030                     182
+      084                     169
+      000                     155
+      013                     119
+      104                     112
+      091                      98
+      078                      93
+      096                      90
+      168                      83
+[1;35m[TASK][0m Task 2.4
+[1;30m[TIMER][0m (Database) Getting all users that have taken the bus took 2.35ms
+[1;34m[INFO][0m Users that have taken the bus:
+  User ID
+---------
+      091
+      105
+      052
+      062
+      085
+      084
+[1;35m[TASK][0m Task 2.5
+[1;30m[TIMER][0m (Database) Getting top users with the most different transportation modes took 4.04ms
+[1;34m[INFO][0m Top 10 users with the most different transportation modes:
+  User ID    Number of different transportation modes
+---------  ------------------------------------------
+      062                                          10
+      065                                           5
+      085                                           5
+      161                                           4
+      102                                           4
+      084                                           4
+      078                                           4
+      091                                           3
+      096                                           3
+      052                                           3
+[1;35m[TASK][0m Task 2.6
+[1;30m[TIMER][0m (Database) Getting all duplicate activities took 1.08s
+[1;34m[INFO][0m Duplicate activities:
+User ID    Activity ID    Start date time    End date time
+---------  -------------  -----------------  ---------------
+[1;35m[TASK][0m Task 2.7 a
+[1;30m[TIMER][0m (Database) Getting amount of users with activities lasting to next day took 1.80ms
+[1;34m[INFO][0m Amount of users with activities lasting to the next day: 31
+[1;35m[TASK][0m Task 2.7 b
+[1;30m[TIMER][0m (Database) Getting users with activities lasting to next day took 0.83ms
+[1;34m[INFO][0m Users with activities lasting to the next day (limit=15):
+  User ID  Transportation mode      duration (hours)
+---------  ---------------------  ------------------
+      076  car                                1.95
+      134                                     0.1
+      134                                    13.5833
+      150                                     4.3833
+      150                                     1.15
+      150                                     0.8
+      150                                     1.2833
+      157                                    16.0833
+      150                                     1.3167
+      091                                     7.9333
+      062                                     2.9333
+      104                                     8.85
+      104                                    10.1333
+      091                                     5.8
+      104                                     2.5833
+[1;35m[TASK][0m Task 2.8
+[1;30m[TIMER][0m (Algoritmo) find_the_number_of_users_which_have_been_close_to_each_other_in_time_and_space took 1.51m
+[1;34m[INFO][0m Number of users which have been close to each other in time and space: 28
+[1;35m[TASK][0m Task 2.9
+[1;30m[TIMER][0m (Algoritmo) top_n_users_gained_most_elevation took 17.21s
+[1;34m[INFO][0m Top 15 users gained most elevation:
+  User ID    Elevation gained (meters)
+---------  ---------------------------
+      041                       107752
+      062                        52905
+      038                        46593
+      025                        35117
+      078                        22397
+      014                        19580
+      007                        18448
+      084                        15663
+      012                        15537
+      085                        15335
+      105                        14595
+      000                        14582
+      065                        14365
+      022                        14210
+      166                        13291
+[1;35m[TASK][0m Task 2.10
+[1;30m[TIMER][0m (Database) Getting distinct transportation modes took 1.85ms
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 3.51ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 3.72ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by bike:
+  User ID    Transportation mode
+---------  ---------------------
+      097                29.2168
+      062                19.3501
+      167                12.4499
+      065                 3.4502
+      096                 2.0334
+      102                 1.1167
+      064                 0.4333
+      161                 0.05
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 6.48ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 6.73ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by taxi:
+  User ID    Transportation mode
+---------  ---------------------
+      062                 1.7
+      098                 0.9667
+      078                 0.85
+      085                 0.7
+      102                 0.05
+      161                 0.0333
+      065                 0.0167
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 4.07ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 4.22ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by car:
+  User ID    Transportation mode
+---------  ---------------------
+      076                13.3334
+      062                 6.6999
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 3.58ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 3.71ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by walk:
+  User ID    Transportation mode
+---------  ---------------------
+      062                56.6833
+      085                14.8833
+      084                10.5998
+      078                 8.7832
+      105                 6.3
+      096                 4.0167
+      102                 1.6334
+      091                 1.0833
+      065                 1.0334
+      082                 0.95
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 7.62ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 9.15ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by bus:
+  User ID    Transportation mode
+---------  ---------------------
+      062               190.433
+      085                 8.0001
+      084                 1.5
+      091                 0.3333
+      052                 0.2666
+      105                 0.1167
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 4.47ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 4.82ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by subway:
+  User ID    Transportation mode
+---------  ---------------------
+      085                 2.5667
+      082                 0.65
+      062                 0.55
+      078                 0.3666
+      084                 0.0667
+      065                 0
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 3.90ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 4.01ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by train:
+  User ID    Transportation mode
+---------  ---------------------
+      062                    4.1
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 3.25ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 3.35ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by boat:
+  User ID    Transportation mode
+---------  ---------------------
+      062                 0.1833
+[1;30m[TIMER][0m (Database) Getting users longest distance one day per trasnportation mode took 8.20ms
+[1;30m[TIMER][0m (Algoritmo) top_users_a_day took 8.34ms
+[1;34m[INFO][0m Top 10 users with most distance traveled by run:
+  User ID    Transportation mode
+---------  ---------------------
+      062                      0
+[1;35m[TASK][0m Task 2.11
+[1;30m[TIMER][0m (Database) Getting all users took 2.02ms
+[1;30m[TIMER][0m (Algoritmo) users_count_invalid_activities took 21.39s
+[1;34m[INFO][0m Users with invalid activities:
+  User ID    Number of invalid activities
+---------  ------------------------------
+      025                             263
+      062                             248
+      041                             201
+      085                             182
+      167                             134
+      014                             118
+      000                             101
+      030                             101
+      084                              99
+      104                              97
+      091                              63
+      038                              58
+      022                              55
+      015                              46
+      052                              44
+      012                              43
+      096                              35
+      036                              34
+      009                              31
+      134                              31
+      007                              30
+      013                              29
+      024                              27
+      071                              27
+      082                              27
+      065                              25
+      103                              24
+      078                              19
+      168                              19
+      040                              17
+      150                              16
+      055                              15
+      083                              15
+      097                              14
+      046                              13
+      102                              13
+      023                              11
+      099                              11
+      105                               9
+      157                               9
+      158                               9
+      169                               9
+      063                               8
+      076                               8
+      053                               7
+      064                               7
+      161                               7
+      047                               6
+      070                               5
+      098                               5
+      135                               5
+      159                               5
+      133                               4
+      031                               3
+      077                               3
+      090                               3
+      132                               3
+      054                               2
+      079                               2
+      166                               2
+      048                               1
+      151                               1
+[1;35m[TASK][0m Task 2.12
+[1;30m[TIMER][0m (Algoritmo) users_favorite_transportation_mode took 318.53ms
+[1;34m[INFO][0m Users favorite transportation mode:
+  User ID  Transportation mode
+---------  ---------------------
+      052  bus
+      062  bus
+      064  bike
+      065  bike
+      076  car
+      078  walk
+      082  walk
+      084  walk
+      085  walk
+      091  walk
+      096  bike
+      097  bike
+      098  taxi
+      102  walk
+      105  walk
+      161  bike
+      167  bike
+[1;34m[INFO][0m Connection to 8.1.0 is closed
+[1;30m[TIMER][0m (Database) Database shutdown took 2.06ms
+[1;30m[TIMER][0m (App) App shutdown took 2.08ms
