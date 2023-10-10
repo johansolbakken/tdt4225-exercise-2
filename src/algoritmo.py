@@ -14,6 +14,9 @@ import model as Model
 import db as Database
 import random
 
+def feet_to_meters(feet: float) -> float:
+    return feet * 0.3048
+
 def create_clusters_based_on_distance(trackpoints, min_radius_meter, min_time_sec):
     clusters = []  # Initialize an empty list to store clusters
     
@@ -91,7 +94,7 @@ def top_n_users_gained_most_elevation(n: int=15):
     users = Model.get_all_users()
     for user in users:
         highest_elevation = find_highest_elevation(user)
-        elevators.append((user.id, highest_elevation))
+        elevators.append((user.id, feet_to_meters(highest_elevation)))
 
     Log.enabled(True)
 
